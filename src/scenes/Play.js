@@ -12,7 +12,7 @@ class Play extends Phaser.Scene {
 
         this.load.tilemapTiledJSON('mappy','assets/Maps/HexTilemap.json');
         
-
+                
         // keyW = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
         // keyA = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
         // keyS = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
