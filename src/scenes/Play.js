@@ -4,70 +4,102 @@ class Play extends Phaser.Scene {
     }
 
     preload() {
-        // this.load.image('tiles', 'assets/drawtiles-spaced.png');
-        // this.load.image('car', 'assets/Dude.png');
-        // this.load.tilemapCSV('map', 'assets/Grid.csv');
 
-        this.load.image('square', 'assets/hexfinder.png');
-
-        this.load.tilemapTiledJSON('mappy','assets/Maps/HexTilemap.json');
+        this.load.image('hexfinder', './assets/hexfinder.png');
+        this.load.tilemapTiledJSON('map', 'assets/Maps/HexGrid.json');
         
+        console.log('tiles');
 
-        // keyW = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
-        // keyA = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
-        // keyS = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
-        // keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
+
     }
 
     create() {
-        // this.target = new Phaser.Math.Vector2();
-        // var map = this.make.tilemap({ key: 'map', tileWidth: 32, tileHeight: 32 });
-        // var tileset = map.addTilesetImage('tiles', null, 32, 32, 1, 2);
-        // var layer = map.createLayer(0, tileset, 0, 0);
-        // this.player = this.physics.add.image(32 + 16, 32 + 16, 'car');
+        this.map = this.make.tilemap({ key: 'map' });
+        console.log("1");
+        this.tileset = this.map.addTilesetImage('hexfinder');
+        console.log("2");
+        this.layer = this.map.createLayer('Ground', this.tileset, 0, 0);
 
-        // console.log("1");
-        // let mappy = this.add.tilemap('mappy');
-        // console.log("2");
-        // this.square = this.map.addTilesetImage('square');
-        // console.log("3");
-        // this.botlayer = this.map.createStaticLayer('Ground', [this.square],0,0);
+        console.log("1" + this.map);
 
-        // console.log(this.map, this.square, this.botlayer);
+        this.marker = this.add.graphics();
+        this.marker.lineStyle(3, 0xffffff, 1);
+        this.marker.strokeRect(0, 0, this.map.tileWidth, this.map.tileHeight);
+
+        this.help = this.add.text(16, 500, 'Click on a tile to view its properties.', {
+            font: '20px Arial',
+            fill: '#ffffff'
+        });
+        this.help.setScrollFactor(0);
+        
+        this.propertiesText = this.add.text(16, 540, 'Properties: ', {
+            fontSize: '18px',
+            fill: '#ffffff'
+        });
+
 
     }
     update() {
-        // var moved = false;
-        // if (Phaser.Input.Keyboard.JustDown(keyW)) {
-        //     this.target.x = this.player.x;
-        //     this.target.y = this.player.y - 32;
-        //     moved = true;
-        // }
-        // else if (Phaser.Input.Keyboard.JustDown(keyA)) {
-        //     this.target.x = this.player.x - 32;
-        //     this.target.y = this.player.y;
-        //     moved = true;
-        // }
-        // else if (Phaser.Input.Keyboard.JustDown(keyS)) {
-        //     this.target.x = this.player.x;
-        //     this.target.y = this.player.y + 32;
-        //     moved = true;
-        // }
-        // else if (Phaser.Input.Keyboard.JustDown(keyD)) {
-        //     this.target.x = this.player.x + 32;
-        //     this.target.y = this.player.y;
-        //     moved = true;
-        // }
-        // if(moved){
-        //     moved = false;
-        //     this.physics.moveToObject(this.player, this.target, 200);
-        //     console.log(this.player.x, this.target.x);
-        // }
-        // var distance = Phaser.Math.Distance.Between(this.player.x, this.player.y, this.target.x, this.target.y);
-        // if(distance < 4 ){
-        //     this.player.body.reset(this.target.x, this.target.y);
-        // }
+        this.worldPoint = this.input.activePointer.positionToCamera(this.cameras.main);
 
+        // Rounds down to nearest tile
+        //console.log(this.map);
+        //console.log(this.map.getTileAtWorldXY(this.input.x,this.input.y));
+        //console.log(Phaser.Tilemaps.Components.HexagonalWorldToTileXY(this.input.x, this.input.y));
+
+        //console.log(this.map.HexagonalWorldToTileY(this.input.y));
+        var test = this.map.getTileAtWorldXY(this.input.x, this.input.y);
+        if(test!=null){
+            console.log(test.x, test.y);
+            this.pointerTileX = test.x;
+            this.pointerTileY = test.y;
+
+
+        }
+        //console.log(test.x);
+        
+        // console.log();
+        // console.log(this.pointerTileX, this.pointerTileY);
+
+
+        //console.log(Phaser.Math.RoundTo(this.pointerTile.x, 0),Phaser.Math.RoundTo(this.pointerTile.y, 0) );
+    
+
+
+        // this.pointerTile = this.map.worldToTileXY(this.worldPoint.x, this.worldPoint.y);
+        // //console.log(Phaser.Math.RoundTo(this.pointerTile.x, 0),Phaser.Math.RoundTo(this.pointerTile.y, 0) );
+        // this.pointerTile.x = Phaser.Math.RoundTo(this.pointerTile.x, 0);
+        // this.pointerTile.y = Phaser.Math.RoundTo(this.pointerTile.y, 0);
+        //console.log(this.map.worldToTileXY(200,200));
+
+    
+        //console.log(this.pointerTile.x, this.pointerTile.y);
+
+
+        //console.log(this.worldPoint.x, this.worldPoint.y);
+        // Snap to tile coordinates, but in world space
+
+        
+        var between = this.map.tileToWorldXY(this.pointerTileX, this.pointerTileY);
+        //console.log(between);
+        this.marker.x = between.x;
+        this.marker.y = between.y
+
+        //console.log(this.pointerTile.x, this.marker.x, this.pointerTile.y, this.marker.y);
+
+
+        //console.log(this.marker.x, this.marker.y);
+
+
+        if (this.input.manager.activePointer.isDown) {
+            this.tile = this.map.getTileAt(this.pointerTileY, this.pointerTileY);
+
+            if (this.tile) {
+                // Note: JSON.stringify will convert the object tile properties to a string
+                this.propertiesText.setText('Properties: ' + JSON.stringify(this.tile.properties));
+                this.tile.properties.viewed = true;
+            }
+        }
 
     }
 
