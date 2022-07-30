@@ -47,8 +47,9 @@ class Play extends Phaser.Scene {
             this.clicked();
             if (this.selectedTile.x != null && this.selectedTile.y != null) {
                 if (this.tile.properties.character) {
-
+                    console.time('Function #1');
                     this.DisplayMovement(this.tile, this.tile.properties.characterObject.speed);
+                    console.timeEnd('Function #1')
                 }
             }
         }, this);
@@ -103,6 +104,7 @@ class Play extends Phaser.Scene {
                 //this.selectedTile = this.tile;
                 this.selectedTile.x = this.tile.x;
                 this.selectedTile.y = this.tile.y;
+                this.movement.clear(true,true);
                 // console.log(this.high.x);
             }
             else {
@@ -122,65 +124,51 @@ class Play extends Phaser.Scene {
     DisplayMovement(tile, speed) {
         
         if(speed == 0){
-            this.movement.add(this.add.image(tile.pixelX, tile.pixelY, 'walkable').setOrigin(0, 0));
+            var move = this.movement.getChildren();
+            //console.log(move);
+            var duplicate = false;
+            
+            for(var i = move.length - 1; i >= 0; i--){
+                if(move[i].x == tile.pixelX && move[i].y == tile.pixelY){
+                    duplicate = true;
+                    break;
+                }
+            }
+            if(!duplicate){
+                this.movement.add(this.add.image(tile.pixelX, tile.pixelY, 'walkable').setOrigin(0, 0));
+            }
+
+            console.log(this.movement);
             return;
+            
         }
-        // var efficient;
-        // efficient = tile.properties.UpLeft;
-        if (tile.properties.UpLeft && tile.properties.UpLeft.properties.Walkable && !tile.properties.UpLeft.properties.occupied) {
+        var tileDirection;
+        tileDirection = tile.properties.UpLeft;
+        if (tileDirection && tileDirection.properties.Walkable && !tileDirection.properties.occupied) {
             this.DisplayMovement(tile.properties.UpLeft, speed - 1);
         }
-        if (tile.properties.UpRight && tile.properties.UpRight.properties.Walkable && !tile.properties.UpRight.properties.occupied) {
-            this.DisplayMovement(tile.properties.UpRight, speed - 1);
+        tileDirection = tile.properties.UpRight;
+        if (tileDirection && tileDirection.properties.Walkable && !tileDirection.properties.occupied) {
+            this.DisplayMovement(tileDirection, speed - 1);
+        }
+        tileDirection = tile.properties.Left;
+        if (tileDirection && tileDirection.properties.Walkable && !tileDirection.properties.occupied) {
+            this.DisplayMovement(tileDirection, speed - 1);
+        }
+        tileDirection = tile.properties.Right;
+        if (tileDirection && tileDirection.properties.Walkable && !tileDirection.properties.occupied) {
+            this.DisplayMovement(tileDirection, speed - 1);
+        }
+        tileDirection = tile.properties.DownLeft;
+        if (tileDirection && tileDirection.properties.Walkable && !tileDirection.properties.occupied) {
+            this.DisplayMovement(tileDirection, speed - 1);
+        }
+        tileDirection = tile.properties.DownRight;
+        if (tileDirection && tileDirection.properties.Walkable && !tileDirection.properties.occupied) {
+            this.DisplayMovement(tileDirection, speed - 1);
         }
 
-        if (tile.properties.Left && tile.properties.Left.properties.Walkable && !tile.properties.Left.properties.occupied) {
-            this.DisplayMovement(tile.properties.Left, speed - 1);
-        }
-        if (tile.properties.Right && tile.properties.Right.properties.Walkable && !tile.properties.Right.properties.occupied) {
-            this.DisplayMovement(tile.properties.Right, speed - 1);
-        }
-
-        if (tile.properties.DownLeft && tile.properties.DownLeft.properties.Walkable && !tile.properties.DownLeft.properties.occupied) {
-            this.DisplayMovement(tile.properties.DownLeft, speed - 1);
-        }
-        if (tile.properties.DownRight && tile.properties.DownRight.properties.Walkable && !tile.properties.DownRight.properties.occupied) {
-            this.DisplayMovement(tile.properties.DownRight, speed - 1);
-        }
-
-
-        // if(this.selectedTile.x != null && this.selectedTile.y != null){
-        //     if(this.tile.properties.character){
-        //         for(var i = 0; i < this.tile.properties.characterObject.speed; i++){
-
-
-
-
-
-
-        // var refTile = this.map.tileToWorldXY(this.tile.x, this.tile.y - 1);
-        // this.movement.add(this.add.image(refTile.x, refTile.y, 'walkable').setOrigin(0, 0));
-
-        // refTile = this.map.tileToWorldXY(this.tile.x + 1, this.tile.y - 1);
-        // this.movement.add(this.add.image(refTile.x, refTile.y, 'walkable').setOrigin(0, 0));
-
-        // refTile = this.map.tileToWorldXY(this.tile.x + 1, this.tile.y);
-        // this.movement.add(this.add.image(refTile.x, refTile.y, 'walkable').setOrigin(0, 0));
-
-        // refTile = this.map.tileToWorldXY(this.tile.x + 1, this.tile.y + 1);
-        // this.movement.add(this.add.image(refTile.x, refTile.y, 'walkable').setOrigin(0, 0));
-
-        // refTile = this.map.tileToWorldXY(this.tile.x, this.tile.y + 1);
-        // this.movement.add(this.add.image(refTile.x, refTile.y, 'walkable').setOrigin(0, 0));
-
-        // refTile = this.map.tileToWorldXY(this.tile.x - 1, this.tile.y);
-        // this.movement.add(this.add.image(refTile.x, refTile.y, 'walkable').setOrigin(0, 0));
-
-
-        //         }
-        //     }
-
-        // }
+        
     }
     updateGrid() {
         // for each object(character) if they have moved update the hexs to reflect that.
@@ -188,7 +176,6 @@ class Play extends Phaser.Scene {
         var update = this.characters.getChildren();
         for (var i = 0; i < update.length; i++) {
             update[i].tile.properties.occupied = true;
-
             update[i].tile.properties.character = update[i].type;
             update[i].tile.properties.characterObject = update[i];
             // Need to clear the previous instance
